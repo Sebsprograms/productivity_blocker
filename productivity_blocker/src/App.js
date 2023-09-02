@@ -5,6 +5,10 @@ import './App.css';
 function App() {
   const [blockedSites, setBlockedSites] = useState(['www.google.com']);
 
+  function addToBlockedSites() {
+    setBlockedSites(prev => [...prev, window.location.href])
+  }
+
   return (
     <div className="App">
       <h1>Blocked Websites</h1>
@@ -12,7 +16,7 @@ function App() {
         {blockedSites.map((site) => <BlockedSite title={site} />)}
       </div>
 
-      <button>
+      <button onClick={addToBlockedSites}>
         Block Current Site
       </button>
     </div>

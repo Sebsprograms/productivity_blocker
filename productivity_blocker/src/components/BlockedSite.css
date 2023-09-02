@@ -4,4 +4,10 @@
     background-color: #fff;
     margin-bottom: 8px;
     border-radius: 8px;
+    cursor: pointer;
+}
+
+.blocked-site>a {
+    word-break: break-all;
+    white-space: normal;
 }
