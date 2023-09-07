@@ -1,46 +1,100 @@
+const urlsKey = 'blockedUrls';
+const timeKey = 'time';
+await initCollections();
+await updateView();
+
 const blockButton = document.getElementById('block-btn');
-const testButton = document.getElementById('test-btn');
+const test = document.getElementById('test-btn');
+
+test.addEventListener('click', async () => {
+    await chrome.storage.local.get([urlsKey], async function (result) {
+        const urls = result[urlsKey];
+        console.log(
+            urls
+        );
+    });
+});
 
 
 blockButton.addEventListener('click', async () => {
-    console.log('block button clicked');
-    await saveCurrentTabUrl();
-})
-
-testButton.addEventListener('click', async () => {
-    console.log('test button clicked');
-    await getUrl(generateKey());
+    await getAndSaveCurrentTabUrl();
 });
 
-async function saveCurrentTabUrl() {
+// We want to initialize an empty urls array if it doesn't exist
+async function initCollections() {
+    await chrome.storage.local.get([urlsKey]).then(async (result) => {
+        if (!result[urlsKey]) {
+            await chrome.storage.local.set({ [urlsKey]: [] });
+        }
+    });
+    await chrome.storage.local.get([timeKey]).then(async (result) => {
+        if (!result[timeKey]) {
+            await chrome.storage.local.set({ [timeKey]: '' });
+        }
+    });
+}
+
+// Update the contents of our unordered list with the urls
+async function updateView() {
+    await chrome.storage.local.get([urlsKey], function (result) {
+        const urls = result[urlsKey];
+        const outerContainer = document.getElementById('urls-list');
+        outerContainer.innerHTML = '';
+        urls.forEach(url => {
+            const container = document.createElement('div');
+            container.className = 'url-container';
+
+            // Add the url to the container first
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.innerText = url;
+            container.appendChild(a);
+
+            // Add a delete button
+            const img = document.createElement('img');
+            img.src = 'images/delete.png';
+            img.className = 'icon';
+            img.addEventListener('click', async () => {
+                await deleteOneUrl(url);
+            });
+
+            container.appendChild(img);
+            outerContainer.appendChild(container);
+        });
+    });
+}
+
+async function deleteOneUrl(url) {
+    await chrome.storage.local.get([urlsKey], async function (result) {
+        const urls = result[urlsKey];
+        const index = urls.indexOf(url);
+        urls.splice(index, 1);
+        await chrome.storage.local.set({ [urlsKey]: urls });
+    });
+
+    setTimeout(async () => {
+        await updateView();
+    }, 10);
+
+}
+
+async function getAndSaveCurrentTabUrl() {
     await chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
         const activeTab = tabs[0];
         const activeTabUrl = activeTab.url;
 
         await saveUrl(activeTabUrl);
-
-
     });
 }
 
 // We want to save the url to chrome storage
 async function saveUrl(url) {
-    const key = generateKey();
-
-    // Url is saved as a key value pair
-    // The key is an int exactly like a 0 indexed array & the value is the url.
-    await chrome.storage.local.set({ [key]: url }).then(() => {
-        console.log("Value is set");
+    await chrome.storage.local.get([urlsKey]).then(async (result) => {
+        const urls = result[urlsKey];
+        if (!urls.includes(url)) {
+            await chrome.storage.local.set({ [urlsKey]: [url, ...urls] });
+        }
     });
-}
-
-async function getUrl(key) {
-    await chrome.storage.local.get([key]).then((result) => {
-        console.log("Value currently is " + result[key]);
-    });
-}
-
-
-function generateKey() {
-    return 'testKey';
+    await updateView();
 }

@@ -1,8 +1,33 @@
 body {
     width: 450px;
     background-color: #eee;
+    padding: 1rem;
 }
 
 h1 {
     text-align: center;
+}
+
+#urls-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.url-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #ccc;
+    margin-bottom: 8px;
+}
+
+.icon {
+    background-color: rgb(255, 112, 112);
+    padding: 6px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
 }
