@@ -4,16 +4,6 @@ await initCollections();
 await updateView();
 
 const blockButton = document.getElementById('block-btn');
-const test = document.getElementById('test-btn');
-
-test.addEventListener('click', async () => {
-    await chrome.storage.local.get([urlsKey], async function (result) {
-        const urls = result[urlsKey];
-        console.log(
-            urls
-        );
-    });
-});
 
 
 blockButton.addEventListener('click', async () => {
@@ -46,6 +36,7 @@ async function updateView() {
 
             // Add the url to the container first
             const a = document.createElement('a');
+            a.className = 'url';
             a.href = url;
             a.target = '_blank';
             a.innerText = url;
@@ -90,11 +81,22 @@ async function getAndSaveCurrentTabUrl() {
 
 // We want to save the url to chrome storage
 async function saveUrl(url) {
+    const sanitizedUrl = cleanBaseUrl(url);
     await chrome.storage.local.get([urlsKey]).then(async (result) => {
         const urls = result[urlsKey];
-        if (!urls.includes(url)) {
-            await chrome.storage.local.set({ [urlsKey]: [url, ...urls] });
+        if (!urls.includes(sanitizedUrl)) {
+            await chrome.storage.local.set({ [urlsKey]: [sanitizedUrl, ...urls] });
         }
     });
     await updateView();
+}
+
+function cleanBaseUrl(url) {
+    // Use a regular expression to capture the base URL and optional query parameters
+    const regex = /^(https?:\/\/[^/?#]+).*$/i;
+
+    // Use the replace method to extract the base URL
+    const cleanedUrl = url.replace(regex, '$1');
+
+    return cleanedUrl;
 }

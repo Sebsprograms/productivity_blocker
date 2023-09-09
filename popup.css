@@ -11,6 +11,19 @@ h1 {
 #urls-list {
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
+    max-height: 400px;
+}
+
+#urls-list::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+
+#urls-list::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
 .url-container {
@@ -23,6 +36,13 @@ h1 {
     margin-bottom: 8px;
 }
 
+.url {
+    max-width: 90%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .icon {
     background-color: rgb(255, 112, 112);
     padding: 6px;
@@ -30,4 +50,19 @@ h1 {
     width: 32px;
     height: 32px;
     cursor: pointer;
+}
+
+#block-btn {
+    margin: 0 auto;
+    border: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    background-color: rgb(95, 247, 95);
+}
+
+#controls {
+    margin-top: 8px;
+    width: 100%;
 }
